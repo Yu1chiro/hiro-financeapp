@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Masuk ke Hera Finance untuk mengelola keuangan pribadi.">
+  <title>Masuk — Hera Finance</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232E6650'/%3E%3Cpath d='M18 42V22h7v7h14v-7h7v20h-7v-7H25v7z' fill='%23F4EEDA'/%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <script>
+    tailwind.config={theme:{extend:{colors:{forest:'#2E6650',pine:'#214D3C',sage:'#9BB89D',mint:'#DDEBDD',cream:'#F7F2E5',ink:'#20352D',clay:'#C8795D'},boxShadow:{soft:'0 18px 55px rgba(33,77,60,.13)'}}}}
+  </script>
+  <style>
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .field-error{min-height:1.25rem}
+    .leaf-grid{background-image:radial-gradient(circle at 20% 20%,rgba(155,184,157,.30) 0 2px,transparent 2.5px);background-size:28px 28px}
+    .input-control{width:100%;border:1px solid #d7dfd7;border-radius:1rem;background:#fff;padding:.85rem 2.8rem .85rem 2.8rem;color:#20352d;outline:none;transition:.2s}
+    .input-control:focus{border-color:#2e6650;box-shadow:0 0 0 4px rgba(46,102,80,.11)}
+    .input-control.invalid{border-color:#c8795d;box-shadow:0 0 0 4px rgba(200,121,93,.10)}
+  </style>
+</head>
+<body class="min-h-screen bg-cream text-ink">
+  <main class="min-h-screen grid lg:grid-cols-[1.05fr_.95fr]">
+    <section class="hidden lg:flex relative overflow-hidden bg-pine p-14 text-white flex-col justify-between leaf-grid">
+      <div class="absolute -right-24 -top-24 h-80 w-80 rounded-full border-[48px] border-white/5"></div>
+      <div class="relative flex items-center gap-3">
+        <div class="h-11 w-11 rounded-2xl bg-cream text-forest grid place-items-center shadow-lg"><i class="fa-solid fa-leaf"></i></div>
+        <div><p class="font-bold text-xl">Hera Finance</p><p class="text-sm text-white/65">Keuangan pribadi yang lebih tenang</p></div>
+      </div>
+      <div class="relative max-w-xl">
+        <p class="text-sm uppercase tracking-[.28em] text-mint/70 mb-5">Satu ruang untuk semua pos</p>
+        <h1 class="text-5xl leading-tight font-semibold">Lihat uangmu dengan jernih, lalu tentukan langkah berikutnya.</h1>
+        <div class="mt-9 grid grid-cols-3 gap-3 text-sm">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4"><i class="fa-solid fa-wallet text-mint mb-3"></i><p>Saldo aktual</p></div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4"><i class="fa-solid fa-graduation-cap text-mint mb-3"></i><p>Target UKT</p></div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4"><i class="fa-solid fa-shield-heart text-mint mb-3"></i><p>Dana darurat</p></div>
+        </div>
+      </div>
+      <p class="relative text-sm text-white/55">Data disimpan di akun pribadimu dan dilindungi sesi aman.</p>
+    </section>
+
+    <section class="flex items-center justify-center p-5 sm:p-10">
+      <div class="w-full max-w-md">
+        <div class="lg:hidden flex items-center gap-3 mb-9">
+          <div class="h-11 w-11 rounded-2xl bg-forest text-white grid place-items-center"><i class="fa-solid fa-leaf"></i></div>
+          <div><p class="font-bold text-xl">Hera Finance</p><p class="text-sm text-slate-500">Keuangan pribadi</p></div>
+        </div>
+
+        <div class="rounded-[2rem] bg-white shadow-soft border border-white p-6 sm:p-9">
+          <div class="mb-7">
+            <p id="eyebrow" class="text-sm font-semibold text-forest">Selamat datang kembali</p>
+            <h2 id="formTitle" class="text-3xl font-bold mt-1">Masuk ke akun</h2>
+            <p id="formCopy" class="mt-2 text-slate-500">Gunakan email atau username yang sudah terdaftar.</p>
+          </div>
+
+          <div id="statusBox" class="hidden mb-5 rounded-2xl border p-4 text-sm" role="alert"></div>
+
+          <form id="authForm" novalidate>
+            <div id="registerFields" class="hidden">
+              <label for="username" class="block text-sm font-semibold mb-2">Username</label>
+              <div class="relative"><i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="username" name="username" class="input-control" autocomplete="username" placeholder="contoh: hera"></div>
+              <p id="usernameError" class="field-error mt-1 text-xs text-clay"></p>
+
+              <label for="email" class="block text-sm font-semibold mb-2 mt-2">Email</label>
+              <div class="relative"><i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="email" name="email" type="email" class="input-control" autocomplete="email" placeholder="nama@email.com"></div>
+              <p id="emailError" class="field-error mt-1 text-xs text-clay"></p>
+            </div>
+
+            <div id="loginIdentifierWrap">
+              <label for="identifier" class="block text-sm font-semibold mb-2">Email atau username</label>
+              <div class="relative"><i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="identifier" name="identifier" class="input-control" autocomplete="username" placeholder="nama@email.com"></div>
+              <p id="identifierError" class="field-error mt-1 text-xs text-clay"></p>
+            </div>
+
+            <label for="password" class="block text-sm font-semibold mb-2 mt-2">Password</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input id="password" name="password" type="password" class="input-control" autocomplete="current-password" placeholder="Masukkan password">
+              <button type="button" data-toggle="password" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-forest" aria-label="Tampilkan password"><i class="fa-regular fa-eye"></i></button>
+            </div>
+            <p id="passwordError" class="field-error mt-1 text-xs text-clay"></p>
+
+            <div id="confirmWrap" class="hidden">
+              <label for="confirmPassword" class="block text-sm font-semibold mb-2 mt-2">Konfirmasi password</label>
+              <div class="relative">
+                <i class="fa-solid fa-shield-halved absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input id="confirmPassword" name="confirmPassword" type="password" class="input-control" autocomplete="new-password" placeholder="Ulangi password">
+                <button type="button" data-toggle="confirmPassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-forest" aria-label="Tampilkan konfirmasi password"><i class="fa-regular fa-eye"></i></button>
+              </div>
+              <p id="confirmPasswordError" class="field-error mt-1 text-xs text-clay"></p>
+            </div>
+
+            <button id="submitButton" class="mt-4 w-full rounded-2xl bg-forest px-5 py-3.5 text-white font-semibold hover:bg-pine focus:outline-none focus:ring-4 focus:ring-forest/20 disabled:opacity-60 disabled:cursor-not-allowed transition">
+              <span id="buttonText">Masuk</span><i id="buttonSpinner" class="fa-solid fa-circle-notch fa-spin ml-2 hidden"></i>
+            </button>
+          </form>
+
+          <p class="mt-6 text-center text-sm text-slate-500"><span id="switchCopy">Belum memiliki akun?</span> <button id="switchMode" type="button" class="font-semibold text-forest hover:underline">Buat akun utama</button></p>
+        </div>
+        <p class="text-center text-xs text-slate-400 mt-6"><i class="fa-solid fa-lock mr-1"></i> Token autentikasi tidak disimpan di localStorage.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toastRegion" class="fixed right-4 top-4 z-50 space-y-3" aria-live="polite"></div>
+
+  <script>
+    const state={mode:'login',loading:false};
+    const $=(id)=>document.getElementById(id);
+    const authForm=$('authForm');
+
+    function setMode(mode){
+      state.mode=mode;
+      const register=mode==='register';
+      $('registerFields').classList.toggle('hidden',!register);
+      $('confirmWrap').classList.toggle('hidden',!register);
+      $('loginIdentifierWrap').classList.toggle('hidden',register);
+      $('formTitle').textContent=register?'Buat akun utama':'Masuk ke akun';
+      $('eyebrow').textContent=register?'Mulai pencatatan dengan aman':'Selamat datang kembali';
+      $('formCopy').textContent=register?'Registrasi hanya tersedia untuk akun pertama aplikasi ini.':'Gunakan email atau username yang sudah terdaftar.';
+      $('buttonText').textContent=register?'Buat akun':'Masuk';
+      $('switchCopy').textContent=register?'Sudah memiliki akun?':'Belum memiliki akun?';
+      $('switchMode').textContent=register?'Masuk':'Buat akun utama';
+      $('password').autocomplete=register?'new-password':'current-password';
+      hideStatus(); clearErrors(); authForm.reset();
+    }
+
+    function fieldError(id,message){
+      const input=$(id),error=$(`${id}Error`);
+      input.classList.toggle('invalid',Boolean(message));
+      input.setAttribute('aria-invalid',message?'true':'false');
+      if(error) error.textContent=message||'';
+      return !message;
+    }
+
+    function validateField(id){
+      const value=$(id).value.trim();
+      if(id==='identifier') return fieldError(id,value?'':'Email atau username wajib diisi.');
+      if(id==='username') return fieldError(id,/^[A-Za-z0-9_.-]{3,40}$/.test(value)?'':'Gunakan 3–40 karakter: huruf, angka, titik, _ atau -.');
+      if(id==='email') return fieldError(id,/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)?'':'Masukkan alamat email yang valid.');
+      if(id==='password'){
+        if(state.mode==='login') return fieldError(id,value?'':'Password wajib diisi.');
+        return fieldError(id,value.length>=10&&/[a-z]/.test(value)&&/[A-Z]/.test(value)&&/\d/.test(value)?'':'Minimal 10 karakter dengan huruf besar, kecil, dan angka.');
+      }
+      if(id==='confirmPassword') return fieldError(id,value&&value===$('password').value?'':'Konfirmasi password belum sama.');
+      return true;
+    }
+
+    function validateForm(){
+      const fields=state.mode==='register'?['username','email','password','confirmPassword']:['identifier','password'];
+      return fields.map(validateField).every(Boolean);
+    }
+
+    function clearErrors(){['username','email','identifier','password','confirmPassword'].forEach(id=>fieldError(id,''));}
+    function hideStatus(){$('statusBox').classList.add('hidden');}
+    function showStatus(message,type='error'){
+      const box=$('statusBox'); box.textContent=message; box.className=`mb-5 rounded-2xl border p-4 text-sm ${type==='error'?'border-red-200 bg-red-50 text-red-700':'border-emerald-200 bg-emerald-50 text-emerald-700'}`;
+    }
+    function toast(message,type='error'){
+      const el=document.createElement('div');
+      el.className=`max-w-sm rounded-2xl px-4 py-3 shadow-soft border bg-white flex items-start gap-3 ${type==='error'?'border-red-200':'border-emerald-200'}`;
+      const icon=document.createElement('i'); icon.className=`fa-solid ${type==='error'?'fa-circle-exclamation text-red-500':'fa-circle-check text-emerald-600'} mt-1`;
+      const text=document.createElement('p'); text.className='text-sm text-slate-700'; text.textContent=message;
+      el.append(icon,text); $('toastRegion').appendChild(el); setTimeout(()=>el.remove(),4200);
+    }
+
+    document.querySelectorAll('input').forEach(input=>{input.addEventListener('input',()=>{hideStatus();validateField(input.id);if(input.id==='password'&&state.mode==='register'&&$('confirmPassword').value)validateField('confirmPassword');});});
+    document.querySelectorAll('[data-toggle]').forEach(button=>button.addEventListener('click',()=>{
+      const input=$(button.dataset.toggle); const visible=input.type==='text'; input.type=visible?'password':'text';
+      button.querySelector('i').className=`fa-regular ${visible?'fa-eye':'fa-eye-slash'}`; button.setAttribute('aria-label',visible?'Tampilkan password':'Sembunyikan password');
+    }));
+    $('switchMode').addEventListener('click',()=>setMode(state.mode==='login'?'register':'login'));
+
+    authForm.addEventListener('submit',async(event)=>{
+      event.preventDefault(); if(state.loading||!validateForm())return;
+      state.loading=true; $('submitButton').disabled=true; $('buttonSpinner').classList.remove('hidden'); hideStatus();
+      const payload=state.mode==='register'?{username:$('username').value.trim(),email:$('email').value.trim(),password:$('password').value,confirmPassword:$('confirmPassword').value}:{identifier:$('identifier').value.trim(),password:$('password').value};
+      try{
+        const response=await fetch(`/api/auth/${state.mode==='register'?'register':'login'}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+        const result=await response.json();
+        if(!response.ok)throw new Error(result.message||'Autentikasi gagal.');
+        toast(state.mode==='register'?'Akun utama berhasil dibuat.':'Login berhasil.','success');
+        setTimeout(()=>location.href='/',450);
+      }catch(error){showStatus(error.message);toast(error.message);}
+      finally{state.loading=false;$('submitButton').disabled=false;$('buttonSpinner').classList.add('hidden');}
+    });
+  </script>
+</body>
+</html>

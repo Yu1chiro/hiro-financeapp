@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Statistik dan laporan bulanan Hera Finance.">
+  <title>Statistik — Hera Finance</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232E6650'/%3E%3Cpath d='M18 42V22h7v7h14v-7h7v20h-7v-7H25v7z' fill='%23F4EEDA'/%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <script>tailwind.config={theme:{extend:{colors:{forest:'#2E6650',pine:'#214D3C',sage:'#9BB89D',mint:'#DDEBDD',cream:'#F7F2E5',ink:'#20352D',clay:'#C8795D',gold:'#C79A4B'},boxShadow:{soft:'0 12px 40px rgba(33,77,60,.10)'}}}}</script>
+  <style>
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f7f2e5;color:#20352d}.card{border:1px solid rgba(155,184,157,.22);background:#fff;border-radius:1.4rem;box-shadow:0 8px 28px rgba(33,77,60,.06)}.control{border:1px solid #d8e0d8;border-radius:.9rem;background:#fff;padding:.65rem .8rem;outline:none;color:#20352d}.control:focus{border-color:#2e6650;box-shadow:0 0 0 3px rgba(46,102,80,.10)}.btn-primary{border-radius:.8rem;background:#2e6650;color:#fff;padding:.65rem .9rem;font-size:.875rem;font-weight:700}.btn-primary:hover{background:#214d3c}.progress-fill{transition:width .45s ease}.safe-bottom{padding-bottom:2rem}@media(min-width:1024px){.safe-bottom{padding-bottom:2.5rem}}
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="sticky top-0 z-30 bg-cream/90 backdrop-blur-xl border-b border-sage/20">
+    <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-7 py-3.5 flex flex-wrap items-center gap-x-3 gap-y-3">
+      <button id="mobileMenuButton" class="lg:hidden h-10 w-10 shrink-0 rounded-xl bg-pine text-white grid place-items-center text-base hover:bg-forest focus:outline-none focus:ring-4 focus:ring-forest/20" type="button" aria-label="Buka menu navigasi" aria-controls="mobileNavDrawer" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+      <a href="/" class="hidden lg:grid h-10 w-10 shrink-0 rounded-xl bg-pine text-white place-items-center text-sm hover:bg-forest" aria-label="Kembali ke dashboard"><i class="fa-solid fa-arrow-left"></i></a>
+
+      <div class="min-w-0 flex-1">
+        <p class="hidden sm:block text-[11px] uppercase tracking-[.16em] text-forest font-bold">Analisis keuangan</p>
+        <h1 class="text-lg sm:text-xl font-bold truncate">Statistik</h1>
+      </div>
+
+      <div class="w-full sm:w-auto flex items-center gap-2">
+        <label for="endMonth" class="text-xs sm:text-sm text-slate-500 shrink-0">Periode</label>
+        <input id="endMonth" type="month" class="control h-10 min-w-0 flex-1 sm:flex-none sm:w-[145px] text-sm">
+        <button id="reloadButton" class="h-10 w-10 shrink-0 rounded-xl bg-mint text-forest grid place-items-center text-sm hover:bg-sage/40" aria-label="Muat ulang"><i class="fa-solid fa-rotate"></i></button>
+        <button id="exportButton" class="btn-primary h-10 shrink-0 whitespace-nowrap"><i class="fa-solid fa-file-csv sm:mr-2"></i><span class="hidden sm:inline">Export CSV</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="safe-bottom max-w-[1500px] mx-auto p-4 sm:p-7 space-y-6">
+    <section class="grid xl:grid-cols-[1.35fr_.65fr] gap-6">
+      <article class="card p-4 sm:p-6"><div><p class="text-sm text-slate-500">12 bulan terakhir</p><h2 class="text-xl font-bold">Pemasukan dan pengeluaran</h2></div><div id="cashflowChart" class="mt-4 min-h-[340px]"></div></article>
+      <article class="card p-4 sm:p-6"><div><p class="text-sm text-slate-500">Komposisi</p><h2 class="text-xl font-bold">Pengeluaran per kategori</h2></div><div id="categoryChart" class="mt-4 min-h-[340px]"></div><div id="categoryEmpty" class="hidden text-center text-sm text-slate-500 py-20">Belum ada pengeluaran untuk periode ini.</div></article>
+    </section>
+    <section class="card p-4 sm:p-6"><div><p class="text-sm text-slate-500">Perubahan aset lancar</p><h2 class="text-xl font-bold">Saldo bulanan</h2></div><div id="balanceChart" class="mt-4 min-h-[300px]"></div></section>
+    <section class="grid lg:grid-cols-2 gap-6">
+      <article class="card p-5 sm:p-6"><div class="flex items-center gap-3"><span class="h-11 w-11 rounded-2xl bg-orange-50 text-orange-700 grid place-items-center"><i class="fa-solid fa-hand-holding-dollar"></i></span><div><p class="text-sm text-slate-500">Progres cicilan</p><h2 class="text-xl font-bold">Utang pribadi</h2></div></div><div id="debtProgressList" class="mt-6 space-y-5"></div></article>
+      <article class="card p-5 sm:p-6"><div class="flex items-center gap-3"><span class="h-11 w-11 rounded-2xl bg-mint text-forest grid place-items-center"><i class="fa-solid fa-bullseye"></i></span><div><p class="text-sm text-slate-500">Target dan realisasi</p><h2 class="text-xl font-bold">UKT & dana darurat</h2></div></div><div id="goalProgressList" class="mt-6 space-y-5"></div></article>
+    </section>
+    <section class="rounded-[1.4rem] bg-pine text-white p-6 flex flex-col md:flex-row md:items-center justify-between gap-5"><div><p class="text-sm text-white/60">Laporan bulanan untuk Excel</p><h2 class="text-xl font-bold mt-1">Unduh ringkasan dan histori transaksi lengkap</h2><p class="text-sm text-white/60 mt-2">File memakai UTF-8 BOM dan pemisah titik koma agar nyaman dibuka di Microsoft Excel Indonesia.</p></div><button id="exportBottom" class="rounded-xl bg-cream text-pine px-5 py-3 font-bold whitespace-nowrap"><i class="fa-solid fa-download mr-2"></i>Unduh laporan</button></section>
+  </main>
+
+  <div id="mobileNavBackdrop" class="lg:hidden fixed inset-0 z-40 bg-pine/45 backdrop-blur-[2px] opacity-0 pointer-events-none transition-opacity duration-200" aria-hidden="true"></div>
+
+  <aside id="mobileNavDrawer" class="lg:hidden fixed inset-y-0 left-0 z-50 w-[min(84vw,310px)] bg-cream shadow-2xl -translate-x-full transition-transform duration-300 ease-out flex flex-col" aria-hidden="true">
+    <div class="flex items-center justify-between gap-3 px-4 py-4 border-b border-sage/25 bg-white">
+      <a href="/" class="flex items-center gap-3 min-w-0">
+        <span class="h-10 w-10 shrink-0 rounded-xl bg-pine text-white grid place-items-center text-sm"><i class="fa-solid fa-leaf"></i></span>
+        <span class="min-w-0"><strong class="block text-base leading-tight truncate">Hera Finance</strong><small class="block text-xs text-slate-500 mt-0.5">Ruang keuangan pribadi</small></span>
+      </a>
+      <button id="closeMobileMenu" class="h-10 w-10 shrink-0 rounded-xl bg-slate-100 text-slate-500 grid place-items-center text-base hover:bg-slate-200" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto p-3 space-y-1.5" aria-label="Navigasi mobile">
+      <a href="/" class="w-full flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm text-slate-600 hover:bg-mint/60"><i class="fa-solid fa-house w-5 text-center text-sm"></i><span>Beranda</span></a>
+      <a href="/?view=transactions" class="w-full flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm text-slate-600 hover:bg-mint/60"><i class="fa-solid fa-arrow-right-arrow-left w-5 text-center text-sm"></i><span>Transaksi</span></a>
+      <a href="/?view=debts" class="w-full flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm text-slate-600 hover:bg-mint/60"><i class="fa-solid fa-hand-holding-dollar w-5 text-center text-sm"></i><span>Utang</span></a>
+      <a href="/?view=goals" class="w-full flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm text-slate-600 hover:bg-mint/60"><i class="fa-solid fa-bullseye w-5 text-center text-sm"></i><span>Target keuangan</span></a>
+      <span class="w-full flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-bold bg-mint text-pine" aria-current="page"><i class="fa-solid fa-chart-pie w-5 text-center text-sm"></i><span>Statistik</span></span>
+      <a href="/?view=profile" class="w-full flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm text-slate-600 hover:bg-mint/60"><i class="fa-solid fa-user-gear w-5 text-center text-sm"></i><span>Profil & saldo</span></a>
+    </nav>
+
+    <div class="p-4 border-t border-sage/25 bg-white">
+      <p class="text-xs leading-relaxed text-slate-500">Gunakan menu untuk berpindah halaman tanpa menutupi area statistik.</p>
+    </div>
+  </aside>
+  <div id="toastRegion" class="fixed right-4 top-4 z-50 space-y-3" aria-live="polite"></div>
+
+  <script>
+    const $=id=>document.getElementById(id);const state={charts:[]};
+    function openMobileMenu(){$('mobileNavBackdrop').classList.remove('opacity-0','pointer-events-none');$('mobileNavBackdrop').classList.add('opacity-100');$('mobileNavDrawer').classList.remove('-translate-x-full');$('mobileNavBackdrop').setAttribute('aria-hidden','false');$('mobileNavDrawer').setAttribute('aria-hidden','false');$('mobileMenuButton').setAttribute('aria-expanded','true');document.body.classList.add('overflow-hidden');setTimeout(()=>$('closeMobileMenu').focus(),100)}
+    function closeMobileMenu(){$('mobileNavBackdrop').classList.add('opacity-0','pointer-events-none');$('mobileNavBackdrop').classList.remove('opacity-100');$('mobileNavDrawer').classList.add('-translate-x-full');$('mobileNavBackdrop').setAttribute('aria-hidden','true');$('mobileNavDrawer').setAttribute('aria-hidden','true');$('mobileMenuButton').setAttribute('aria-expanded','false');document.body.classList.remove('overflow-hidden')}
+    $('mobileMenuButton').addEventListener('click',openMobileMenu);$('closeMobileMenu').addEventListener('click',closeMobileMenu);$('mobileNavBackdrop').addEventListener('click',closeMobileMenu);document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMobileMenu()});
+    function rupiah(value,compact=false){const n=Number(value||0);if(compact&&Math.abs(n)>=1_000_000)return `Rp${(n/1_000_000).toLocaleString('id-ID',{maximumFractionDigits:1})} jt`;return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n)}
+    function h(tag,className='',text=''){const node=document.createElement(tag);node.className=className;if(text!==undefined)node.textContent=text;return node}
+    function toast(message,type='error'){const wrap=h('div',`max-w-sm rounded-2xl px-4 py-3 shadow-soft border bg-white flex items-start gap-3 ${type==='error'?'border-red-200':'border-emerald-200'}`);wrap.append(h('i',`fa-solid ${type==='error'?'fa-circle-exclamation text-red-500':'fa-circle-check text-emerald-600'} mt-1`),h('p','text-sm text-slate-700',message));$('toastRegion').append(wrap);setTimeout(()=>wrap.remove(),4000)}
+    async function api(url){const response=await fetch(url,{credentials:'same-origin'});const data=await response.json();if(response.status===401){location.href='/signin';throw new Error('Sesi berakhir.')}if(!response.ok)throw new Error(data.message||'Data statistik gagal dimuat.');return data}
+    const base={chart:{fontFamily:'Inter, ui-sans-serif, system-ui',toolbar:{show:false},foreColor:'#64748b'},grid:{borderColor:'#e8eee8',strokeDashArray:4},dataLabels:{enabled:false},tooltip:{theme:'light'},noData:{text:'Belum ada data'}};
+    function destroyCharts(){state.charts.forEach(chart=>chart.destroy());state.charts=[]}
+    function addChart(target,options){const chart=new ApexCharts(document.querySelector(target),options);chart.render();state.charts.push(chart)}
+    function progressRow(name,actual,target,progress,meta){const wrap=h('div');const labels=h('div','flex items-start justify-between gap-4 text-sm mb-2');const left=h('div');left.append(h('p','font-semibold',name),h('p','text-xs text-slate-500 mt-1',meta));labels.append(left,h('span','font-bold text-forest',`${Number(progress).toLocaleString('id-ID',{maximumFractionDigits:2})}%`));const track=h('div','h-2.5 rounded-full bg-slate-100 overflow-hidden');const fill=h('div','progress-fill h-full rounded-full bg-forest');fill.style.width=`${Math.min(100,Number(progress))}%`;track.append(fill);const detail=h('p','text-xs text-slate-500 mt-2',`${rupiah(actual)} dari ${rupiah(target)}`);wrap.append(labels,track,detail);return wrap}
+    async function load(){
+      try{
+        const end=$('endMonth').value;const result=await api(`/api/statistics?end=${end}`);const d=result.data;destroyCharts();
+        const months=d.monthly.map(row=>row.month);addChart('#cashflowChart',{...base,chart:{...base.chart,type:'bar',height:340},series:[{name:'Pemasukan',data:d.monthly.map(r=>Number(r.income))},{name:'Pengeluaran',data:d.monthly.map(r=>Number(r.expense))}],colors:['#2E6650','#C8795D'],plotOptions:{bar:{borderRadius:5,columnWidth:'55%'}},xaxis:{categories:months,labels:{rotate:-35}},yaxis:{labels:{formatter:v=>rupiah(v,true)}},tooltip:{y:{formatter:v=>rupiah(v)}}});
+        $('categoryChart').classList.toggle('hidden',!d.categories.length);$('categoryEmpty').classList.toggle('hidden',d.categories.length>0);if(d.categories.length)addChart('#categoryChart',{...base,chart:{...base.chart,type:'donut',height:340},series:d.categories.map(r=>Number(r.amount)),labels:d.categories.map(r=>r.name),colors:['#2E6650','#9BB89D','#C79A4B','#C8795D','#6F8FAF','#8D7AAE','#537A6B'],legend:{position:'bottom'},stroke:{colors:['#fff'],width:3},plotOptions:{pie:{donut:{size:'68%',labels:{show:true,total:{show:true,label:'Total',formatter:w=>rupiah(w.globals.seriesTotals.reduce((a,b)=>a+b,0),true)}}}}},tooltip:{y:{formatter:v=>rupiah(v)}}});
+        addChart('#balanceChart',{...base,chart:{...base.chart,type:'area',height:300},series:[{name:'Saldo bersih periode',data:d.monthly.map(r=>Number(r.balance))}],colors:['#2E6650'],stroke:{curve:'smooth',width:3},fill:{type:'gradient',gradient:{shadeIntensity:1,opacityFrom:.35,opacityTo:.04}},xaxis:{categories:months},yaxis:{labels:{formatter:v=>rupiah(v,true)}},tooltip:{y:{formatter:v=>rupiah(v)}}});
+        const debtList=$('debtProgressList');debtList.replaceChildren();if(!d.debts.length)debtList.append(h('p','text-sm text-slate-500 py-5 text-center','Belum ada data utang.'));d.debts.forEach(item=>debtList.append(progressRow(item.creditor_name,item.paid,item.original_amount,item.progress,`Sisa ${rupiah(BigInt(item.original_amount)-BigInt(item.paid))}`)));
+        const goalList=$('goalProgressList');goalList.replaceChildren();if(!d.goals.length)goalList.append(h('p','text-sm text-slate-500 py-5 text-center','Belum ada target keuangan.'));d.goals.forEach(item=>{const actual=(BigInt(item.current_balance)+BigInt(item.realized)).toString();goalList.append(progressRow(item.name,actual,item.target_amount,item.progress,item.goal_type==='ukt'?'Target UKT':'Dana darurat'))});
+      }catch(error){toast(error.message)}
+    }
+    function exportCsv(){const month=$('endMonth').value;if(!month)return toast('Pilih bulan laporan.');window.location.href=`/api/reports/monthly?month=${encodeURIComponent(month)}`}
+    $('endMonth').value=new Date().toISOString().slice(0,7);$('reloadButton').addEventListener('click',load);$('endMonth').addEventListener('change',load);$('exportButton').addEventListener('click',exportCsv);$('exportBottom').addEventListener('click',exportCsv);load();
+  </script>
+</body>
+</html>
