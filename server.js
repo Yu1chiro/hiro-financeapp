@@ -199,21 +199,6 @@ app.set('trust proxy', 1);
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
-  next();
-});
-app.use((req, _res, next) => {
-  if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && process.env.APP_ORIGIN && req.get('origin') && req.get('origin') !== process.env.APP_ORIGIN) {
-    return next(new AppError(403, 'Origin permintaan tidak diizinkan.', 'INVALID_ORIGIN'));
-  }
-  next();
-});
 app.use(express.static(path.join(__dirname, 'public'), { index: false, maxAge: IS_PRODUCTION ? '1h' : 0 }));
 
 const authLimiter = rateLimit({
@@ -1029,4 +1014,4 @@ async function startServer(){
 
 if(require.main===module) startServer().catch(error=>{console.error('Gagal menjalankan aplikasi:',error.message);process.exit(1);});
 
-module.exports={app,pool,parseMoney,formatIDR,percentage,validDate,validMonth,transactionPayload};
+module.exports = app;
